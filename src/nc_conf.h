@@ -53,6 +53,7 @@
 #define CONF_DEFAULT_SERVER_FAILURE_LIMIT    2
 #define CONF_DEFAULT_SERVER_CONNECTIONS      1
 #define CONF_DEFAULT_KETAMA_PORT             11211
+#define CONF_DEFAULT_KETAMA_POINTS           0
 
 struct conf_listen {
     struct string   pname;   /* listen: as "name:port" */
@@ -77,6 +78,7 @@ struct conf_pool {
     hash_type_t        hash;                  /* hash: */
     struct string      hash_tag;              /* hash_tag: */
     dist_type_t        distribution;          /* distribution: */
+    int                ketama_points;         /* ketama_points: */
     int                timeout;               /* timeout: */
     int                backlog;               /* backlog: */
     int                client_connections;    /* client_connections: */

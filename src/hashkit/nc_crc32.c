@@ -109,15 +109,21 @@ hash_crc32(const char *key, size_t key_length)
 }
 
 uint32_t
-hash_crc32a(const char *key, size_t key_length)
+hash_crc32a_add(unsigned int crc, const char *key, size_t key_length)
 {
     const uint8_t *p = key;
-    uint32_t crc;
 
-    crc = ~0U;
+    crc = ~crc;
+
     while (key_length--) {
         crc = crc32tab[(crc ^ *p++) & 0xFF] ^ (crc >> 8);
     }
 
     return crc ^ ~0U;
+}
+
+uint32_t
+hash_crc32a(const char *key, size_t key_length)
+{
+    return hash_crc32a_add(0U, key, key_length);
 }

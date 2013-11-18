@@ -39,6 +39,7 @@
     ACTION( DIST_KETAMA,        ketama        ) \
     ACTION( DIST_MODULA,        modula        ) \
     ACTION( DIST_RANDOM,        random        ) \
+    ACTION( DIST_KETAMAP,       ketamap       ) \
 
 #define DEFINE_ACTION(_hash, _name) _hash,
 typedef enum hash_type {
@@ -60,6 +61,7 @@ uint32_t hash_md5(const char *key, size_t key_length);
 uint32_t hash_crc16(const char *key, size_t key_length);
 uint32_t hash_crc32(const char *key, size_t key_length);
 uint32_t hash_crc32a(const char *key, size_t key_length);
+uint32_t hash_crc32a_add(unsigned int crc, const char *key, size_t key_length);
 uint32_t hash_fnv1_64(const char *key, size_t key_length);
 uint32_t hash_fnv1a_64(const char *key, size_t key_length);
 uint32_t hash_fnv1_32(const char *key, size_t key_length);
@@ -74,5 +76,7 @@ rstatus_t modula_update(struct server_pool *pool);
 uint32_t modula_dispatch(struct continuum *continuum, uint32_t ncontinuum, uint32_t hash);
 rstatus_t random_update(struct server_pool *pool);
 uint32_t random_dispatch(struct continuum *continuum, uint32_t ncontinuum, uint32_t hash);
+rstatus_t ketamap_update(struct server_pool *pool);
+struct continuum *ketamap_dispatch(struct continuum *continuum, uint32_t ncontinuum, uint32_t hash);
 
 #endif

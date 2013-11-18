@@ -612,6 +612,7 @@ static struct server *
 server_pool_server(struct server_pool *pool, uint8_t *key, uint32_t keylen)
 {
     struct server *server;
+    struct continuum *continuum;
     uint32_t hash, idx;
 
     ASSERT(array_n(&pool->server) != 0);
@@ -630,6 +631,12 @@ server_pool_server(struct server_pool *pool, uint8_t *key, uint32_t keylen)
 
     case DIST_RANDOM:
         idx = random_dispatch(pool->continuum, pool->ncontinuum, 0);
+        break;
+
+    case DIST_KETAMAP:
+        hash = server_pool_hash(pool, key, keylen);
+        continuum = ketamap_dispatch(pool->continuum, pool->ncontinuum, hash);
+        idx = continuum->index;
         break;
 
     default:
@@ -756,6 +763,9 @@ server_pool_run(struct server_pool *pool)
 
     case DIST_RANDOM:
         return random_update(pool);
+
+    case DIST_KETAMAP:
+        return ketamap_update(pool);
 
     default:
         NOT_REACHED();

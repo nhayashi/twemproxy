@@ -58,6 +58,10 @@ static struct command conf_commands[] = {
       conf_set_distribution,
       offsetof(struct conf_pool, distribution) },
 
+    { string("ketama_points"),
+      conf_set_num,
+      offsetof(struct conf_pool, ketama_points) },
+
     { string("timeout"),
       conf_set_num,
       offsetof(struct conf_pool, timeout) },
@@ -177,6 +181,7 @@ conf_pool_init(struct conf_pool *cp, struct string *name)
     cp->hash = CONF_UNSET_HASH;
     string_init(&cp->hash_tag);
     cp->distribution = CONF_UNSET_DIST;
+    cp->ketama_points = CONF_UNSET_NUM;
 
     cp->timeout = CONF_UNSET_NUM;
     cp->backlog = CONF_UNSET_NUM;
@@ -266,6 +271,7 @@ conf_pool_each_transform(void *elem, void *data)
     sp->key_hash = hash_algos[cp->hash];
     sp->dist_type = cp->distribution;
     sp->hash_tag = cp->hash_tag;
+    sp->ketama_points = cp->ketama_points;
 
     sp->redis = cp->redis ? 1 : 0;
     sp->timeout = cp->timeout;
@@ -317,6 +323,7 @@ conf_dump(struct conf *cf)
         log_debug(LOG_VVERB, "  hash_tag: \"%.*s\"", cp->hash_tag.len,
                   cp->hash_tag.data);
         log_debug(LOG_VVERB, "  distribution: %d", cp->distribution);
+        log_debug(LOG_VVERB, "  ketama_points: %d", cp->ketama_points);
         log_debug(LOG_VVERB, "  client_connections: %d",
                   cp->client_connections);
         log_debug(LOG_VVERB, "  redis: %d", cp->redis);
@@ -1195,6 +1202,10 @@ conf_validate_pool(struct conf *cf, struct conf_pool *cp)
 
     if (cp->hash == CONF_UNSET_HASH) {
         cp->hash = CONF_DEFAULT_HASH;
+    }
+
+    if (cp->ketama_points == CONF_UNSET_NUM) {
+        cp->ketama_points = CONF_DEFAULT_KETAMA_POINTS;
     }
 
     if (cp->timeout == CONF_UNSET_NUM) {

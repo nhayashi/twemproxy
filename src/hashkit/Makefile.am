@@ -16,6 +16,7 @@ libhashkit_a_SOURCES =		\
 	nc_hsieh.c		\
 	nc_jenkins.c		\
 	nc_ketama.c		\
+	nc_ketamap.c		\
 	nc_md5.c		\
 	nc_modula.c		\
 	nc_murmur.c		\
