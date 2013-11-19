@@ -78,5 +78,6 @@ rstatus_t random_update(struct server_pool *pool);
 uint32_t random_dispatch(struct continuum *continuum, uint32_t ncontinuum, uint32_t hash);
 rstatus_t ketamap_update(struct server_pool *pool);
 struct continuum *ketamap_dispatch(struct continuum *continuum, uint32_t ncontinuum, uint32_t hash);
+struct continuum *ketamap_dispatch0(struct continuum *continuum, uint32_t ncontinuum, uint32_t hash, uint32_t total_weight);
 
 #endif

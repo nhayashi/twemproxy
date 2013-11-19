@@ -107,7 +107,8 @@ struct server_pool {
     socklen_t          addrlen;              /* socket length */
     struct sockaddr    *addr;                /* socket address (ref in conf_pool) */
     int                dist_type;            /* distribution type (dist_type_t) */
-    int                ketama_points;        /* ketama_points */
+    int                ketama_points;        /* ketama points */
+    uint32_t           total_weight;         /* total weight */
     int                key_hash_type;        /* key hash type (hash_type_t) */
     hash_t             key_hash;             /* key hasher */
     struct string      hash_tag;             /* key hash tag (ref in conf_pool) */

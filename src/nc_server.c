@@ -635,7 +635,10 @@ server_pool_server(struct server_pool *pool, uint8_t *key, uint32_t keylen)
 
     case DIST_KETAMAP:
         hash = server_pool_hash(pool, key, keylen);
-        continuum = ketamap_dispatch(pool->continuum, pool->ncontinuum, hash);
+        if (pool->ketama_points > 0)
+            continuum = ketamap_dispatch(pool->continuum, pool->ncontinuum, hash);
+        else
+            continuum = ketamap_dispatch0(pool->continuum, pool->ncontinuum, hash, pool->total_weight);
         idx = continuum->index;
         break;
 
