@@ -51,7 +51,11 @@ ketamap_update_with_ketama_points(struct server_pool *pool, int64_t now)
 
         static const int sep = ':';
         host_port_delim = strrchr(server->name.data, sep);
-        host_len = host_port_delim - server->name.data;
+        if (host_port_delim) {
+            host_len = host_port_delim - server->name.data;
+        } else {
+            host_len = server->name.len;
+        }
 
         char host[host_len];
         memcpy(host, server->name.data, host_len);
