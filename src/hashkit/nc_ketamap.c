@@ -131,8 +131,8 @@ ketamap_update_without_ketama_points(struct server_pool *pool, int64_t now)
     uint32_t nserver;             /* # server - live and dead */
     uint32_t pointer_counter = 0; /* # pointers on continuum */
     uint32_t continuum_index = 0; /* continuum index */
-    uint32_t total_weight = 0;    /* total live server weight */
-    double scale;
+    double total_weight = 0.0;    /* total live server weight */
+    double weight, scale;
 
     nserver = array_n(&pool->server);
     for (server_index = 0; server_index < nserver; server_index++) {
@@ -144,9 +144,9 @@ ketamap_update_without_ketama_points(struct server_pool *pool, int64_t now)
 
         pointer_counter++;
 
-        uint32_t weight = server->weight / 100.0 + 0.5;
+        weight = server->weight / 100.0;
         total_weight += weight;
-        scale = (double) weight / total_weight;
+        scale = weight / total_weight;
 
         int i;
         for (i = 0; i < continuum_index; i++)
@@ -289,10 +289,10 @@ ketamap_dispatch(struct continuum *continuum, uint32_t ncontinuum, uint32_t hash
 }
 
 struct continuum *
-ketamap_dispatch0(struct continuum *continuum, uint32_t ncontinuum, uint32_t hash, uint32_t total_weight)
+ketamap_dispatch0(struct continuum *continuum, uint32_t ncontinuum, uint32_t hash, double total_weight)
 {
     unsigned int crc32 = (hash >> 16) & 0x00007fffU;
-    unsigned int point = crc32 % total_weight;
+    unsigned int point = crc32 % (unsigned int) (total_weight + 0.5);
     point = (double) point / total_weight * KETAMAP_DISPATCH_MAX_POINT + 0.5;
     point += 1;
     return ketamap_dispatch(continuum, ncontinuum, point);
