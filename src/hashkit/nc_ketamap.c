@@ -32,7 +32,6 @@ ketamap_update_with_ketama_points(struct server_pool *pool, int64_t now)
     uint32_t nserver;             /* # server - live and dead */
     uint32_t pointer_counter = 0; /* # pointers on continuum */
     uint32_t continuum_index = 0; /* continuum index */
-    uint32_t total_weight = 0;    /* total live server weight */
 
     nserver = array_n(&pool->server);
     for (server_index = 0; server_index < nserver; server_index++) {
@@ -83,7 +82,6 @@ ketamap_update_with_ketama_points(struct server_pool *pool, int64_t now)
         point = 0;
         count = pool->ketama_points * server->weight / 100.0 + 0.5;
         pointer_counter += count;
-        total_weight += server->weight / 100.0 + 0.5;
 
         for (i = 0; i < count; ++i) {
             char point_buf[4];
@@ -123,7 +121,6 @@ ketamap_update_with_ketama_points(struct server_pool *pool, int64_t now)
         }
     }
     pool->ncontinuum = pointer_counter;
-    pool->total_weight = total_weight;
     return NC_OK;
 }
 
@@ -156,8 +153,8 @@ ketamap_update_without_ketama_points(struct server_pool *pool, int64_t now)
             pool->continuum[i].value -=
               (double) pool->continuum[i].value * scale;
 
-        pool->continuum[continuum_index].index = server_index;
         pool->continuum[continuum_index].value = KETAMAP_DISPATCH_MAX_POINT;
+        pool->continuum[continuum_index].index = server_index;
         continuum_index++;
     }
     pool->ncontinuum = pointer_counter;
@@ -171,7 +168,7 @@ ketamap_update(struct server_pool *pool)
     uint32_t nserver;      /* # server - live and dead */
     uint32_t nlive_server; /* # live server */
     uint32_t server_index; /* server index */
-    uint32_t total_weight; /* total live server weight */
+    uint32_t total_ncontinuum; /* total live server ncontinuum */
     int64_t now;           /* current timestamp in usec */
 
     ASSERT(array_n(&pool->server) > 0);
@@ -187,7 +184,7 @@ ketamap_update(struct server_pool *pool)
      */
     nserver = array_n(&pool->server);
     nlive_server = 0;
-    total_weight = 0;
+    total_ncontinuum = 0;
     pool->next_rebuild = 0LL;
     for (server_index = 0; server_index < nserver; server_index++) {
         struct server *server = array_get(&pool->server, server_index);
@@ -208,7 +205,8 @@ ketamap_update(struct server_pool *pool)
 
         /* count weight only for live servers */
         if (!pool->auto_eject_hosts || server->next_retry <= now) {
-            total_weight += server->weight / 100.0 + 0.5;
+            total_ncontinuum +=
+              pool->ketama_points * server->weight / 100.0 + 0.5;
         }
     }
 
@@ -233,7 +231,7 @@ ketamap_update(struct server_pool *pool)
         uint32_t nserver_continuum = nlive_server;
         uint32_t ncontinuum;
         if (pool->ketama_points > 0)
-            ncontinuum = pool->ketama_points * total_weight;
+            ncontinuum = total_ncontinuum;
         else
             ncontinuum = nserver_continuum;
 

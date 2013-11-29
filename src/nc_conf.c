@@ -1159,23 +1159,25 @@ conf_validate_server(struct conf *cf, struct conf_pool *cp)
      * is configured, we only check for duplicate "name" and not for duplicate
      * "host:port:weight"
      */
-    array_sort(&cp->server, conf_server_name_cmp);
-    for (valid = true, i = 0; i < nserver - 1; i++) {
-        struct conf_server *cs1, *cs2;
+    if (cp->distribution != DIST_KETAMAP) {
+        array_sort(&cp->server, conf_server_name_cmp);
+        for (valid = true, i = 0; i < nserver - 1; i++) {
+            struct conf_server *cs1, *cs2;
 
-        cs1 = array_get(&cp->server, i);
-        cs2 = array_get(&cp->server, i + 1);
+            cs1 = array_get(&cp->server, i);
+            cs2 = array_get(&cp->server, i + 1);
 
-        if (string_compare(&cs1->name, &cs2->name) == 0) {
-            log_error("conf: pool '%.*s' has servers with same name '%.*s'",
-                      cp->name.len, cp->name.data, cs1->name.len, 
-                      cs1->name.data);
-            valid = false;
-            break;
+            if (string_compare(&cs1->name, &cs2->name) == 0) {
+                log_error("conf: pool '%.*s' has servers with same name '%.*s'",
+                          cp->name.len, cp->name.data, cs1->name.len, 
+                          cs1->name.data);
+                valid = false;
+                break;
+            }
         }
-    }
-    if (!valid) {
-        return NC_ERROR;
+        if (!valid) {
+            return NC_ERROR;
+        }
     }
 
     return NC_OK;
